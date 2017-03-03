@@ -84,7 +84,7 @@ The size of the static page table depends upon 2 things: 1) 1G paging capability
 * If 1G paging is not supported, 2M paging is used.
 *	32 bit addressing need (1+1+4) pages = 24K.
 *	39 bit addressing need (1+1+512) pages = 2M.
-*	48 bit addressing need (1+512+512*512) pages = 1G. **-This seems not acceptable.**
+*	48 bit addressing need (1+512+512*512) pages = 1G. $$< -$$ This seems not acceptable.
 
 
 The maximum address bit is determined by the CPU_HOB if it is present, or the physical address bit returned by the CPUID instruction if the CPU_HOB is not present. (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c, ```CalculateMaximumSupportAddress()```) A platform may set the CPU_HOB based upon the addressing capability of the memory controller or the CPU.

@@ -5,6 +5,6 @@
 * [Memory Protection in SMM](memory-protection-in-SMM.md)
 * [Memory Protection in UEFI](memory-protection-in-uefi.md)
 * [Glossary](glossary.md)
-* References
-* Authors
+* [References](references.md)
+* [Authors](authors.md)
 
