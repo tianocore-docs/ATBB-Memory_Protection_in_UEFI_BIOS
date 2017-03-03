@@ -2,7 +2,7 @@
 In [MemMap], we discussed to how to report the runtime memory attribute by using EFI_MEMORY_ATTRIBUTES_TABLE, so that OS can apply the protection for the runtime code and data. This may bring some compatibility concerns if we choose to adopt the full DEP protection for the entire UEFI memory.
 
 In order to resolve the compatibility concerns, we can define a policy-based setting to enable partial NX and RO protection for the UEFI memory region. The detailed information will be discussed below.
-
+![](/assets/Fig4 - UEFI memory protection.jpg)
  
 Figure 4 - UEFI memory protection
 

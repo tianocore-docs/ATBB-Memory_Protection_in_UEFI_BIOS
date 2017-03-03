@@ -1,7 +1,7 @@
 # Memory Protection in SMM
 
 The SMM is an isolated execution environment [IA32SDM]. [PI] specification volume 4 defines the SMM infrastructure. Figure 1 shows the SMM memory protection. RO designates read-only memory. XD designates execution-disabled memory.
-
+![](/assets/Fig1- SMRAM memory protection.jpg)
  
 Figure 1 - SMRAM memory protection
 
@@ -53,7 +53,7 @@ If ```PcdCpuSmmStaticPageTable``` is FALSE, the PiSmmCpu uses the original dynam
 If ```PcdCpuSmmStaticPageTable``` is TRUE, the PiSmmCpu will try to set the read-only attribute for the page table.
 
 Figure 2 shows the mapping of the protection.
- 
+![](/assets/Fig2 - Mapping of Protection in SMM.jpg) 
 Figure 2 Mapping of Protection in SMM
 
 ## Life cycle of the protection
@@ -113,7 +113,7 @@ As such, if a platform SMI handler does not include the check recommended in [Se
 This protection work is done by ```SetUefiMemMapAttributes()``` at https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c.
 
 Figure 3 shows final image layout.
- 
+ ![](/assets/Fig3 - Page table enforced memory layout.jpg)
 Figure 3 Page table enforced memory layout
 
 The assumption for non-SMRAM access in SMM is described in [SecureSmmComm].
