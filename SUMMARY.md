@@ -2,9 +2,9 @@
 
 * [Introduction](README.md)
 * [Executive Summary](executive-summary.md)
-* [Memory Protection in UEFI BIOS](memory-protection-in-uefi-bios.md)
+* [Memory Protection in SMM](memory-protection-in-SMM.md)
 * [Memory Protection in UEFI](memory-protection-in-uefi.md)
-* Glossary
+* [Glossary](glossary.md)
 * References
 * Authors
 
