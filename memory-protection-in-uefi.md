@@ -110,8 +110,6 @@ This section introduces the memory protection in UEFI.
 [1]: https://github.com/tianocore-docs/Docs/raw/master/White_Papers/A_Tour_Beyond_BIOS_Memory_Map_And_Practices_in_UEFI_BIOS_V2.pdf "MemMap"
 
 
-
-
 [2]: http://uefi.org "UEFI"
 
 
