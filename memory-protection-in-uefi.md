@@ -1,5 +1,6 @@
 # Memory Protection in UEFI
-In [MemMap], we discussed to how to report the runtime memory attribute by using EFI_MEMORY_ATTRIBUTES_TABLE, so that OS can apply the protection for the runtime code and data. This may bring some compatibility concerns if we choose to adopt the full DEP protection for the entire UEFI memory.
+In the white paper [[MemMap][1]], we discussed to how to report the runtime memory attribute by using `EFI_MEMORY_ATTRIBUTES_TABLE`, so that OS can apply the protection for the runtime code and data. This may bring some compatibility concerns if we choose to adopt the full DEP protection for the entire UEFI memory.
+
 
 In order to resolve the compatibility concerns, we can define a policy-based setting to enable partial NX and RO protection for the UEFI memory region. The detailed information will be discussed below.
 ![](/assets/Fig4 - UEFI memory protection.jpg)
@@ -9,7 +10,7 @@ Figure 4 - UEFI memory protection
 ## Protection for PE image
 The DXE core may apply a pre-defined policy to set up the NX attribute for the PE data region and the RO attribute for the PE code region.
 
-1.	The image is loaded by the UEFI boot service - LoadImage(). If an image is loaded in some other way, the DXE core does not have such knowledge and the DXE core cannot apply any protection.
+1.	The image is loaded by the UEFI boot service - `LoadImage()`. If an image is loaded in some other way, the DXE core does not have such knowledge and the DXE core cannot apply any protection.
 2.	The image section is page aligned. If an image is not page aligned, the DXE core cannot apply the page level protection.
 3.	The protection policy can be based upon a PCD ‘PcdImageProtectionPolicy`. (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/MdeModulePkg.dec) Whenever a new image is loaded, the DxeCore checks the source of the image and then decides the policy of the protection. The policy could be to enable the protection if the sections are aligned, or disable the protection. The platform may choose the policy based upon the need. For example, if a platform thinks the image from the firmware volume should be capable of being protection, it can set protection for IMAGE_FROM_FV. But if a platform is not sure about a PCI option ROM or a file system on disk, it can set no-protection.
 
@@ -19,36 +20,38 @@ There are assumptions for the PE image protection in UEFI:
 2.	[Same as SMM] The PE image can be protected if it is page aligned. There should not be any self-modifying-code in the code region. If there is, a platform should not set this PE image to be page aligned.
 3.	A platform may not disable the XD in the DXE phase. If a platform disables the XD in the DXE phase, the X86 page table will become invalid because the XD bit in page table becomes a RESERVED bit. The consequence is that a #PF exception will be generated. If a platform wants to disable the XD bit, it must happen in the PEI phase.
 
-In EDK II, the DXE core image services calls ProtectUefiImage() on image load and UnprotectUefiImage() on image unload. (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Image/Image.c) Then ProtectUefiImageCommon() (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Misc/MemoryProtection.c) calls GetUefiImageProtectionPolicy() to check the image source and protection policy and parses PE alignment. If all checks pass, `SetUefiImageProtectionAttributes()` calls `SetUefiImageMemoryAttributes()`. Finally, `gCpu->SetMemoryAttribute()` sets EFI_MEMORY_XP or EFI_MEMORY_RO for the new loaded image , or clears the protection for the old unloaded image. When the CPU driver gets the memory attribute setting request, it updates page table.
+In EDK II, the DXE core image services calls `ProtectUefiImage()` on image load and `UnprotectUefiImage()` on image unload. (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Image/Image.c) Then `ProtectUefiImageCommon()` (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Misc/MemoryProtection.c) calls `GetUefiImageProtectionPolicy()` to check the image source and protection policy and parses PE alignment. If all checks pass, `SetUefiImageProtectionAttributes()` calls `SetUefiImageMemoryAttributes()`. Finally, `gCpu->SetMemoryAttribute()` sets **EFI_MEMORY_XP** or **EFI_MEMORY_RO** for the new loaded image , or clears the protection for the old unloaded image. When the CPU driver gets the memory attribute setting request, it updates page table.
 
 The X86 CPU driver https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/CpuDxe/CpuDxe.c `CpuSetMemoryAttributes ()` calls  https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/CpuDxe/CpuPageTable.c, `AssignMemoryPageAttributes()` to setup page table.
 
-The ARM CPU driver https://github.com/tianocore/edk2/blob/master/ArmPkg/Drivers/CpuDxe/CpuMmuCommon.c `CpuSetMemoryAttributes()` also has such capability.
+The ARM CPU driver https://github.com/tianocore/edk2/blob/master/ArmPkg/Drivers/CpuDxe/CpuMmuCommon.c `CpuSetMemoryAttributes()` also has similar capability.
 
-If an image is loaded before CPU_ARCH protocol is ready, the DXE core just skips the setting. Later these images protection will be set in CPU_ARCH callback function – MemoryProtectionCpuArchProtocolNotify() (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Misc/MemoryProtection.c).
+If an image is loaded before CPU_ARCH protocol is ready, the DXE core just skips the setting. Later these images protection will be set in CPU_ARCH callback function – `MemoryProtectionCpuArchProtocolNotify() `(https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Misc/MemoryProtection.c).
 
-In ExitBootServices event, `MemoryProtectionExitBootServicesCallback() `(https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Misc/MemoryProtection.c) is invoked to unprotect the runtime image, because the runtime image code relocation need write code segment at `SetVirtualAddressMap()`.
+In `ExitBootServices` event, `MemoryProtectionExitBootServicesCallback() `(https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Misc/MemoryProtection.c) is invoked to unprotect the runtime image, because the runtime image code relocation need write code segment at `SetVirtualAddressMap()`.
 
 ## Protection for stack and heap
-[UEFI] specification allows 
->Stack may be marked as non-executable in identity mapped page tables. 
+[[UEFI][2]] specification allows 
+>"Stack may be marked as non-executable in identity mapped page tables." 
 
 As such, we set up the NX stack (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/DxeIplPeim/X64/VirtualMemory.c, `CreateIdentityMappingPageTables()`).
 
-The heap protection is based upon the policy, because we already observed some unexpected usage in [MemMap]. A platform need configure a PCD `PcdDxeNxMemoryProtectionPolicy` 
+
+
+The heap protection is based upon the policy, because we already observed some unexpected usage in [[MemMap][1]] white paper. A platform needs to  configure a PCD `PcdDxeNxMemoryProtectionPolicy` 
 (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/MdeModulePkg.dec) to indicate which type of memory can be set to NX in the page table. The DxeCore `ApplyMemoryProtectionPolicy()` (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Misc/MemoryProtection.c) consumes the PCD after the memory allocation service and sets NX attribute for the allocated memory by using CPU_ARCH protocol.
 
-Before CPU_ARCH protocol is ready, the protection takes no effect. In CPU_ARCH callback function – `MemoryProtectionCpuArchProtocolNotify() `(https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Misc/MemoryProtection.c), the InitializeDxeNxMemoryProtectionPolicy() is called to get current memory map and setup the NX protection.
+Before CPU_ARCH protocol is ready, the protection takes no effect. In CPU_ARCH callback function – `MemoryProtectionCpuArchProtocolNotify() `(https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/Dxe/Misc/MemoryProtection.c), the `InitializeDxeNxMemoryProtectionPolicy()` is called to get current memory map and setup the NX protection.
 
 
-In addition, we may use some special techniques, such as the guard page, to apply the protection for the allocated memory in order to detect a buffer overflow. This is discussed in [SecurityEnhancement].
+In addition, we may use some special techniques, such as the guard page, to apply the protection for the allocated memory in order to detect a buffer overflow. This is discussed in [[SecurityEnhancement][3]] white paper.
 
 ## Life cycle of the protection
 The UEFI image protection starts when the CpuArch protocol is ready. The UEFI runtime image protection is torn down at `ExitBootServices()`, the runtime image code relocation need write code segment at `SetVirtualAddressMap()`. We cannot assume OS/Loader has taken over page table at that time.
 
-The UEFI heap protection also starts when the CpuArch protocol is ready.
+The UEFI heap protection also starts when the `CpuArch` protocol is ready.
 
-The UEFI stack protection starts in DxeIpl, because the region is fixed and it can set directly.
+The UEFI stack protection starts in `DxeIpl`, because the region is fixed and it can set directly.
 
 
 The UEFI firmware does not own page tables after `ExitBootServices()`, so the OS would have to relax protection of runtime code pages across `SetVirtualAddressMap()`, or delay setting protections on runtime code pages until after `SetVirtualAddressMap()`. OS may set protection on runtime memory based upon EFI_MEMORY_ATTRIBUTES_TABLE later.
@@ -56,9 +59,9 @@ The UEFI firmware does not own page tables after `ExitBootServices()`, so the OS
 ## Size Overhead
 
 1.	Runtime memory overhead (visible to OS)
-:	The size overhead of the runtime PE image is the same as the overhead of the SMM PE image.  If a platform has n runtime images, the average amount overhead is 6K * n.
+:	The size overhead of the runtime PE image is the same as the overhead of the SMM PE image.  If a platform has n runtime images, the average amount overhead is `6K * n`.
 2.	Boot time memory overhead (invisible to OS)
-:	The size of the overhead for the boot time PE image is the same as the overhead of the SMM PE image. If a platform has n boot time images, the average overhead is 6K * n.
+:	The size of the overhead for the boot time PE image is the same as the overhead of the SMM PE image. If a platform has n boot time images, the average overhead is `6K * n`.
 
 If the NX protection for data is enabled, the size of the page table is increased because we need set fine granularity page level protection.
 
@@ -86,7 +89,9 @@ GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
 ```
 2.	Override link flags below to support UEFI memory protection.
 ```css
-[BuildOptions.common.EDKII.DXE_DRIVER, BuildOptions.common.EDKII.DXE_CORE, BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.UEFI_APPLICATION]
+[BuildOptions.common.EDKII.DXE_DRIVER, 
+BuildOptions.common.EDKII.DXE_CORE, 
+BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.UEFI_APPLICATION]
 MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096 
 GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
 ```
@@ -102,3 +107,12 @@ GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
 #### Summary
 This section introduces the memory protection in UEFI.
 
+[1]: https://github.com/tianocore-docs/Docs/raw/master/White_Papers/A_Tour_Beyond_BIOS_Memory_Map_And_Practices_in_UEFI_BIOS_V2.pdf "MemMap"
+
+
+
+
+[2]: http://uefi.org "UEFI"
+
+
+[3]: https://github.com/tianocore-docs/Docs/raw/master/White_Papers/A_Tour_Beyond_BIOS_Securiy_Enhancement_to_Mitigate_Buffer_Overflow_in_UEFI.pdf "Security Enhancment"
