@@ -4,7 +4,7 @@
 
 [DEP] Exploit Mitigation Improvements in Windows 8, Ken Johnson, Ma, Miller, http://media.blackhat.com/bh-us-12/Briefings/M_Miller/BH_US_12_Miller_Exploit_Mitigation_Slides.pdf 
 
-[IA32SDM] Intel® 64 and IA-32 Architectures Software Developer’s Manual, www.intel.com
+[IA32SDM] Intel® 64 and IA-32 Architectures Software Developer’s Manual, www.intel.com https://software.intel.com/en-us/articles/intel-sdm
 
 [MemMap] A Tour Beyond BIOS Memory Map And Practices in UEFI BIOS, Jiewen Yao, Vincent Zimmer, 2016 https://github.com/tianocore-docs/Docs/raw/master/White_Papers/A_Tour_Beyond_BIOS_Memory_Map_And_Practices_in_UEFI_BIOS_V2.pdf
 
@@ -21,10 +21,9 @@
 [UEFI] Unified Extensible Firmware Interface (UEFI) Specification, Version 2.6  
 www.uefi.org 
 
-[1]: https://blogs.technet.microsoft.com/srd/2009/08/04/preventing-the-exploitation-of-user-mode-heap-corruption-vulnerabilities/ "WindowsHeap"
+[VTd] Intel® Virtualization Technology for Directed I/O: Spec, http://www.intel.com/content/www/us/en/embedded/technology/virtualization/vt-directed-io-spec.html
 
-
-[WindowsHeap]: Preventing the exploitation of user mode heap corruption vulnerabilities, 2009, https://blogs.technet.microsoft.com/srd/2009/08/04/preventing-the-exploitation-of-user-mode-heap-corruption-vulnerabilities/
+[WindowsHeap] Preventing the exploitation of user mode heap corruption vulnerabilities, 2009, https://blogs.technet.microsoft.com/srd/2009/08/04/preventing-the-exploitation-of-user-mode-heap-corruption-vulnerabilities/
 
 [WindowsInternal] Windows Internals, 6th edition, Mark E. Russinovich, David A. Solomon, Alex Ionescu, 2012, Microsoft Press. ISBN-13: 978-0735648739/978-0735665873
 

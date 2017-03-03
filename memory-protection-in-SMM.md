@@ -1,6 +1,6 @@
 # Memory Protection in SMM
 
-The SMM is an isolated execution environment according to Intel® 64 and IA-32 Architectures Software Developer’s Manual [[IA32SDM][1]]. UEFI Platform Initialization[[PI][2]] specification volume 4 defines the SMM infrastructure. Figure 1 shows the SMM memory protection. RO designates read-only memory. XD designates execution-disabled memory.
+The SMM is an isolated execution environment according to Intel® 64 and IA-32 Architectures Software Developer’s Manual [[IA32SDM][1]]. The UEFI Platform Initialization [[PI][2]] specification volume 4 defines the SMM infrastructure. Figure 1 shows the SMM memory protection. RO designates read-only memory. XD designates execution-disabled memory.
 
 ![](/assets/Fig1- SMRAM memory protection.jpg)
  
@@ -15,7 +15,7 @@ Later the PiSmmCpu driver (https://github.com/tianocore/edk2/blob/master/UefiCpu
 
 There are several assumptions to support the PE image protection in SMM:
 
-1.	The PE code section and data sections are not merged. If those 2 sections are merged, a #PF exception might be generated because the CPU might try to write a RO data item in the data section or execute an NX instruction in code section.
+1.	The PE code section and data sections are not merged. If those 2 sections are merged, a #PF exception might be generated because the CPU might try to write a RO data item in the data section or execute a non-executable NX instruction in code section.
 2.	The PE image can be protected if it is page aligned. There should not be any self-modified-code in the code region. If there is, a platform should not set this PE image to be page aligned.
 
 A platform may disable the XD in the UEFI environment, but this does not impact the SMM environment. The SMM environment may choose to always enable the XD upon SMM entry, and restore the XD state at the SMM exit point.
@@ -23,7 +23,7 @@ A platform may disable the XD in the UEFI environment, but this does not impact 
 ## Protection for stack and heap
 The PiSmmCore maintains a memory map internally. (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/PiSmmCore/Page.c) If an SMM module allocates the data with `EfiRuntimeServicesCode`, this data is marked as the code page. If the SMM module allocates the data with `EfiRuntimeServicesData`, this data is marked as the data page. This information is also exposed via the `EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE`.
 
-The same RO and XP policy is also applied to the normal SMM data region, such as stack and heap.
+The same RO and XD policy is also applied to the normal SMM data region, such as stack and heap.
 
 ## Protection for critical CPU status
 Besides the PE image, the Intel X86 architecture has some special architecture-specific regions that need to be protected as well.
@@ -40,7 +40,7 @@ The IDT defines the entry point of the exception handler. If the IDT is updated,
 
 This work is done by `PatchGdtIdtMap()` at https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmFuncsArch.c.
 
-However, the IA32 version GDT cannot be set to read-only if the stack guard feature is enabled. (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmFuncsArch.c) The reason is that the IA32 stack guard needs to use a **_task switch_** to switch the stack, and the task switch needs to write the GDT and TSS. The X64 version of the GDT does not have such a problem because the X64 stack guard uses “_**interrupt stack table (IST)**_” to switch the stack. For details of the stack switch and exceptions, please refer to [[IA32SDM][1]].
+However, the IA32 version GDT cannot be set to read-only if the stack guard feature is enabled. (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmFuncsArch.c) The reason is that the IA32 stack guard needs to use a "_task switch_" to switch the stack, and the task switch needs to write the GDT and Task-State Segment TSS. The X64 version of the GDT does not have such a problem because the X64 stack guard uses “_interrupt stack table (IST)_” to switch the stack. For details of the stack switch and exceptions, please refer to [[IA32SDM][1]].
 
 ### Page Table
 In an X86 CPU, we rely on the page table to set up the read-only or non-executable region. In order to prevent the page table itself from being updated, we may need to set the page table itself to be read-only.
@@ -123,7 +123,7 @@ Figure 3 Page table enforced memory layout
 
 The assumption for non-SMRAM access in SMM is described in [[SecureSmmComm][6]].
 Besides that, this solution assumes that all DRAM regions are added to the Global Coherency Domain (GCD) management before EndOfDxe, so that the UEFI memory map can return all DRAM regions. If there are more regions added to the GCD after EndOfDxe, those regions are not set to not-present in the page table.
-NOTE: The SMM does not set the not-present bit for the GCD EfiGcdMemoryTypeNonExistent memory, because this type of memory may be converted to the other types, such as EfiGcdMemoryTypeReserved, or EfiGcdMemoryTypeMemoryMappedIo, which might be accessed by the SMM later.
+NOTE: The SMM does not set the not-present bit for the GCD **EfiGcdMemoryTypeNonExistent** memory, because this type of memory may be converted to the other types, such as **EfiGcdMemoryTypeReserved**, or **EfiGcdMemoryTypeMemoryMappedIo**, which might be accessed by the SMM later.
 
 ## Limitation
 Setting up RO and NX attribute for SMRAM is a good enhancement to prevent a code overriding attack. However it has some limitations:
@@ -134,14 +134,14 @@ Setting up RO and NX attribute for SMRAM is a good enhancement to prevent a code
 To set not-present bit for non-fixed DRAM region in SmmReadyToLock is a good enhancement to enforce the protection policy. However, it cannot cover below cases:
 
 1.	Memory Hot Plug. Take a server platform as the example, A RAS server may hot plug more DRAM during OS runtime, and rely on SMM to initialize those DRAM. This SMM Memory Initialization module may need access the DRAM for the memory test.
-2.	Memory Mapped IO (MMIO). Ideally, not all MMIO regions are configured to be accessible to SMM. Some MMIO BARs are important such as VTd or SPI controller. It should be a platform policy to configure which one should be accessible. The SMI handler must consider the case that the MMIO BAR might be modified by the malicious software and check if the MMIO BAR is in the valid region.
+2.	Memory Mapped IO (MMIO). Ideally, not all MMIO regions are configured to be accessible to SMM. Some MMIO BARs are important such as VTd or SPI controller.  VTd BAR is important because OS need setup VTd to configuration the DMA protection. SPI controller BAR is important because BIOS SMM handler need access it to program the flash device. It should be a platform policy to configure which one should be accessible. The SMI handler must consider the case that the MMIO BAR might be modified by the malicious software and check if the MMIO BAR is in the valid region.
 
 ## Compatibility Considerations
 1.	So far, we have not observed self-modified-code in SMM image or executable code in data section. As such, we believe the PE image protection is compatible.
 
 2.	The protection for the SMM communication buffer may cause a #PF exception in SMM if the SMI handler does not perform the check recommended in [[SecureSmmComm][6]].
 
-3.	Some legacy CSM drivers may need co-work with SMM module. Then the SMM driver need access the legacy region. As such these memory regions should be allocated as ReservedMemory, such as BIOS data area (BDA) or extended BIOS data area (EBDA).
+3.	Some legacy Compatibility Support Module CSM drivers may need co-work with SMM module. Then the SMM driver need access the legacy region. As such these memory regions should be allocated as ReservedMemory, such as BIOS data area (BDA) or extended BIOS data area (EBDA).
 
 ## Call for action
 In order to support SMM memory protection, the firmware need configure SMM driver to be page aligned:
