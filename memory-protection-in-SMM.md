@@ -1,6 +1,6 @@
 # Memory Protection in SMM
 
-The SMM is an isolated execution environment according to Intel® 64 and IA-32 Architectures Software Developer’s Manual [[IA32SDM][1]]. The UEFI Platform Initialization [[PI][2]] specification volume 4 defines the SMM infrastructure. Figure 1 shows the SMM memory protection. RO designates read-only memory. XD designates execution-disabled memory.
+The SMM is an isolated execution environment according to Intel® 64 and IA-32 Architectures Software Developer’s Manual [[IA32SDM][1]]. The UEFI Platform Initialization [[PI][2]] specification volume 4 defines the SMM infrastructure. Figure 1 shows the SMM memory protection. **RO** designates read-only memory. **XD **designates execution-disabled memory.
 
 ![](/assets/Fig1- SMRAM memory protection.jpg)
  
@@ -9,13 +9,13 @@ Figure 1 - SMRAM memory protection
 ## Protection for PE image
 In UEFI/PI firmware, the SMM image is a normal PE/COFF image loaded by the SmmCore. If a given section of the SMM image is page aligned, it may be protected according to the section attributes, such as read-only for the code and non-executable for data. See the top right of figure 1.
 
-In EDK II, the PiSmmCore (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/PiSmmCore/MemoryAttributesTable.c) checks the PE image alignment and builds an `EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE ` (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Include/Guid/PiSmmMemoryAttributesTable.h) to record such information. If the PI SMM image is not page aligned, this table will not be published. If the `EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE` is published, that means the `EfiRuntimeServicesCode` contains only code and it is EFI_MEMORY_RO, and the `EfiRuntimeServicesData` contains only data and it is EFI_MEMORY_XP.
+In EDK II, the PiSmmCore (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/PiSmmCore/MemoryAttributesTable.c) checks the PE image alignment and builds an `EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE ` (https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Include/Guid/PiSmmMemoryAttributesTable.h) to record such information. If the PI SMM image is not page aligned, this table will not be published. If the `EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE` is published, that means the `EfiRuntimeServicesCode` contains only code and it is ``EFI_MEMORY_RO``, and the `EfiRuntimeServicesData` contains only data and it is `EFI_MEMORY_XP`.
 
 Later the PiSmmCpu driver (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c)` SetMemMapAttributes()` API consumes the ``EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE`` and sets the page table attribute.
 
 There are several assumptions to support the PE image protection in SMM:
 
-1.	The PE code section and data sections are not merged. If those 2 sections are merged, a #PF exception might be generated because the CPU might try to write a RO data item in the data section or execute a non-executable NX instruction in code section.
+1.	The PE code section and data sections are not merged. If those 2 sections are merged, a #PF exception might be generated because the CPU might try to write a RO data item in the data section or execute a non-executable (NX) instruction in code section.
 2.	The PE image can be protected if it is page aligned. There should not be any self-modified-code in the code region. If there is, a platform should not set this PE image to be page aligned.
 
 A platform may disable the XD in the UEFI environment, but this does not impact the SMM environment. The SMM environment may choose to always enable the XD upon SMM entry, and restore the XD state at the SMM exit point.
@@ -40,16 +40,16 @@ The IDT defines the entry point of the exception handler. If the IDT is updated,
 
 This work is done by `PatchGdtIdtMap()` at https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmFuncsArch.c.
 
-However, the IA32 version GDT cannot be set to read-only if the stack guard feature is enabled. (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmFuncsArch.c) The reason is that the IA32 stack guard needs to use a "_task switch_" to switch the stack, and the task switch needs to write the GDT and Task-State Segment TSS. The X64 version of the GDT does not have such a problem because the X64 stack guard uses “_interrupt stack table (IST)_” to switch the stack. For details of the stack switch and exceptions, please refer to [[IA32SDM][1]].
+However, the IA32 version GDT cannot be set to read-only if the stack guard feature is enabled. (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmFuncsArch.c) The reason is that the IA32 stack guard needs to use a "_task switch_" to switch the stack, and the task switch needs to write the GDT and Task-State Segment (TSS). The X64 version of the GDT does not have such a problem because the X64 stack guard uses “_interrupt stack table (IST)_” to switch the stack. For details of the stack switch and exceptions, please refer to [[IA32SDM][1]].
 
 ### Page Table
 In an X86 CPU, we rely on the page table to set up the read-only or non-executable region. In order to prevent the page table itself from being updated, we may need to set the page table itself to be read-only.
 
 The work is done at https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c `SetPageTableAttributes()`.
 
-However, setting a page table to be read-only may break the original dynamic paging feature in SMM. There is a PCD ```PcdCpuSmmStaticPageTable ``` to determine if the platform wants to enable the static page table or the dynamic page table.
+However, setting a page table to be read-only may break the original dynamic paging feature in SMM. There is a (PCD) ```PcdCpuSmmStaticPageTable ``` to determine if the platform wants to enable the static page table or the dynamic page table.
 
-If ```PcdCpuSmmStaticPageTable``` is FALSE, the PiSmmCpu uses the original dynamic paging policy, namely the the PiSmmCpu only sets 4GiB paging by default. If the PiSmmCpu needs to access above 4GiB memory locations, a #PF exception is triggered and an above-4GiB mapping is created in the page fault handler.
+If ```PcdCpuSmmStaticPageTable``` is FALSE, the PiSmmCpu uses the original dynamic paging policy, namely the the PiSmmCpu only sets 4GiB paging by default. If the PiSmmCpu needs to access above 4GiB memory locations, a page fault exception (#PF) exception is triggered and an above-4GiB mapping is created in the page fault handler.
 
 If ```PcdCpuSmmStaticPageTable``` is TRUE, the PiSmmCpu will try to set the read-only attribute for the page table.
 
@@ -87,10 +87,10 @@ The size of the static page table depends upon 2 things: 1) 1G paging capability
 * If 1G paging is not supported, 2M paging is used.
 *	32 bit addressing need (1+1+4) pages = 24K.
 *	39 bit addressing need (1+1+512) pages = 2M.
-*	48 bit addressing need (1+512+512*512) pages = 1G. $$< -$$ This seems not acceptable.
+*	48 bit addressing need (1+512+512*512) pages = 1G. $$< -$$ This seems ****not**** acceptable.
 
 
-The maximum address bit is determined by the CPU_HOB if it is present, or the physical address bit returned by the CPUID instruction if the CPU_HOB is not present. (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c, ```CalculateMaximumSupportAddress()```) A platform may set the CPU_HOB based upon the addressing capability of the memory controller or the CPU.
+The maximum address bit is determined by the (CPU_HOB) if it is present, or the physical address bit returned by the CPUID instruction if the CPU_HOB is not present. (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c, ```CalculateMaximumSupportAddress()```) A platform may set the CPU_HOB based upon the addressing capability of the memory controller or the CPU.
 
 ## Performance Overhead
 1.	The SMRAM protection setup is a one-time activity. It happens just after the SmmReadyToLock event. We do not observe too much impact to the system firmware boot performance. The activity only takes some small number of milliseconds.
@@ -141,7 +141,7 @@ To set not-present bit for non-fixed DRAM region in SmmReadyToLock is a good enh
 
 2.	The protection for the SMM communication buffer may cause a #PF exception in SMM if the SMI handler does not perform the check recommended in [[SecureSmmComm][6]].
 
-3.	Some legacy Compatibility Support Module CSM drivers may need co-work with SMM module. Then the SMM driver need access the legacy region. As such these memory regions should be allocated as ReservedMemory, such as BIOS data area (BDA) or extended BIOS data area (EBDA).
+3.	Some legacy Compatibility Support Module (CSM) drivers may need co-work with SMM module. Then the SMM driver need access the legacy region. As such these memory regions should be allocated as ReservedMemory, such as BIOS data area (BDA) or extended BIOS data area (EBDA).
 
 ## Call for action
 In order to support SMM memory protection, the firmware need configure SMM driver to be page aligned:
