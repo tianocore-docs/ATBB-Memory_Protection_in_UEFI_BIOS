@@ -1,6 +1,6 @@
+![](/assets/favicon-96x96.png)
 
-
-White Paper
+#####White Paper
 
 # A Tour Beyond BIOS - Memory Protection in UEFI BIOS
 
