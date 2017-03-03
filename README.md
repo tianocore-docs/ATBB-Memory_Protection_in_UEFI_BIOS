@@ -5,19 +5,17 @@
 
 # A Tour Beyond BIOS - Memory Protection in UEFI BIOS
 
-</br>
-</br>
-
-_Jiewen Yao_</br>
-
-_Intel Corporation_
-
-</br>
-</br>
 
 
-_Vincent J. Zimmer _</br>
-_Intel Corporation_
+  _Jiewen Yao_, 
+  _Intel Corporation_
+
+
+
+
+
+  _Vincent J. Zimmer _, 
+  _Intel Corporation_
 
 
 

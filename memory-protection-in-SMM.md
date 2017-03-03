@@ -87,7 +87,7 @@ The size of the static page table depends upon 2 things: 1) 1G paging capability
 * If 1G paging is not supported, 2M paging is used.
 *	32 bit addressing need (1+1+4) pages = 24K.
 *	39 bit addressing need (1+1+512) pages = 2M.
-*	48 bit addressing need (1+512+512*512) pages = 1G. $$< -$$ This seems ****not**** acceptable.
+*	48 bit addressing need (1+512+512*512) pages = 1G. < - This seems ****not**** acceptable.
 
 
 The maximum address bit is determined by the (CPU_HOB) if it is present, or the physical address bit returned by the CPUID instruction if the CPU_HOB is not present. (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c, ```CalculateMaximumSupportAddress()```) A platform may set the CPU_HOB based upon the addressing capability of the memory controller or the CPU.
@@ -128,7 +128,7 @@ NOTE: The SMM does not set the not-present bit for the GCD **EfiGcdMemoryTypeNon
 ## Limitation
 Setting up RO and NX attribute for SMRAM is a good enhancement to prevent a code overriding attack. However it has some limitations:
 
-1.	It cannot resist a Return-Oriented-Programming (ROP) attack. [ROP]. We might need ASLR to mitigate the ROP attack. [[ASLR][7]] With the code region randomized, an attacker cannot accurately predict the location of instructions in order to leverage gadgets.
+1.	It cannot resist a Return-Oriented-Programming (ROP) attack. [[ROP][8]]. We might need ASLR to mitigate the ROP attack. [[ASLR][7]] With the code region randomized, an attacker cannot accurately predict the location of instructions in order to leverage gadgets.
 2.	Not all important data structure are set to Read-Only. This is the current SMM driver limitation. The SMM driver can be updated to allocate the important structures to be read-only instead of a read-write global variable.
 
 To set not-present bit for non-fixed DRAM region in SmmReadyToLock is a good enhancement to enforce the protection policy. However, it cannot cover below cases:
@@ -172,7 +172,7 @@ This section introduces the memory protection in SMM.
 
 [7]: https://en.wikipedia.org/wiki/Address_space_layout_randomization "ASLR"
 
-
+[8]: https://en.wikipedia.org/wiki/Return-oriented_programming "ROP"
 
 
 
