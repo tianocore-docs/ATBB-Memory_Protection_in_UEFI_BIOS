@@ -78,13 +78,13 @@ The size of the dynamic paging is fixed. We need 6 fixed pages (24K) and 8 on-de
 
 The size of the static page table depends upon 2 things: 1) 1G paging capability, 2) max supported address bit. A rough estimation is below:
 1.	If 1G paging is supported,
-	32 bit addressing need (1+1+4) pages = 24K. (still use 2M paging for below 4G memory)
-	39 bit addressing need (1+1+4) pages = 24K.
-	48 bit addressing need (1+512) pages = 2M.
-	If 1G paging is not supported, 2M paging is used.
-	32 bit addressing need (1+1+4) pages = 24K.
-	39 bit addressing need (1+1+512) pages = 2M.
-	48 bit addressing need (1+512+512*512) pages = 1G. <- This seems not acceptable.
+*	32 bit addressing need (1+1+4) pages = 24K. (still use 2M paging for below 4G memory)
+*	39 bit addressing need (1+1+4) pages = 24K.
+*	48 bit addressing need (1+512) pages = 2M.
+* If 1G paging is not supported, 2M paging is used.
+*	32 bit addressing need (1+1+4) pages = 24K.
+*	39 bit addressing need (1+1+512) pages = 2M.
+*	48 bit addressing need (1+512+512*512) pages = 1G. **-This seems not acceptable.**
 
 
 The maximum address bit is determined by the CPU_HOB if it is present, or the physical address bit returned by the CPUID instruction if the CPU_HOB is not present. (https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c, ```CalculateMaximumSupportAddress()```) A platform may set the CPU_HOB based upon the addressing capability of the memory controller or the CPU.
@@ -122,10 +122,12 @@ NOTE: The SMM does not set the not-present bit for the GCD EfiGcdMemoryTypeNonEx
 
 ## Limitation
 Setting up RO and NX attribute for SMRAM is a good enhancement to prevent a code overriding attack. However it has some limitations:
+
 1.	It cannot resist a Return-Oriented-Programming (ROP) attack. [ROP]. We might need ASLR to mitigate the ROP attack. [ASLR] With the code region randomized, an attacker cannot accurately predict the location of instructions in order to leverage gadgets.
 2.	Not all important data structure are set to Read-Only. This is the current SMM driver limitation. The SMM driver can be updated to allocate the important structures to be read-only instead of a read-write global variable.
 
 To set not-present bit for non-fixed DRAM region in SmmReadyToLock is a good enhancement to enforce the protection policy. However, it cannot cover below cases:
+
 1.	Memory Hot Plug. Take a server platform as the example, A RAS server may hot plug more DRAM during OS runtime, and rely on SMM to initialize those DRAM. This SMM Memory Initialization module may need access the DRAM for the memory test.
 2.	Memory Mapped IO (MMIO). Ideally, not all MMIO regions are configured to be accessible to SMM. Some MMIO BARs are important such as VTd or SPI controller. It should be a platform policy to configure which one should be accessible. The SMI handler must consider the case that the MMIO BAR might be modified by the malicious software and check if the MMIO BAR is in the valid region.
 
@@ -139,10 +141,12 @@ To set not-present bit for non-fixed DRAM region in SmmReadyToLock is a good enh
 ## Call for action
 In order to support SMM memory protection, the firmware need configure SMM driver to be page aligned:
 1.	Override link flags below to support SMM memory protection.
-	```c
-        [BuildOptions.common.EDKII.DXE_SMM_DRIVER, BuildOptions.common.EDKII.SMM_CORE]	
+	```css
+        [BuildOptions.common.EDKII.DXE_SMM_DRIVER,
+        BuildOptions.common.EDKII.SMM_CORE]	
         MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096 
-	GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000```
+	    GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
+	```
 
 2.	Evaluate if SMRAM size is big enough.
 
