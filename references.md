@@ -21,7 +21,10 @@
 [UEFI] Unified Extensible Firmware Interface (UEFI) Specification, Version 2.6  
 www.uefi.org 
 
-[WindowsHeap] Preventing the exploitation of user mode heap corruption vulnerabilities, 2009, https://blogs.technet.microsoft.com/srd/2009/08/04/preventing-the-exploitation-of-user-mode-heap-corruption-vulnerabilities/
+[1]: https://blogs.technet.microsoft.com/srd/2009/08/04/preventing-the-exploitation-of-user-mode-heap-corruption-vulnerabilities/ "WindowsHeap"
+
+
+[WindowsHeap]: Preventing the exploitation of user mode heap corruption vulnerabilities, 2009, https://blogs.technet.microsoft.com/srd/2009/08/04/preventing-the-exploitation-of-user-mode-heap-corruption-vulnerabilities/
 
 [WindowsInternal] Windows Internals, 6th edition, Mark E. Russinovich, David A. Solomon, Alex Ionescu, 2012, Microsoft Press. ISBN-13: 978-0735648739/978-0735665873
 

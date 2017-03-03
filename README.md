@@ -5,11 +5,11 @@
 # A Tour Beyond BIOS - Memory Protection in UEFI BIOS
 
 
-_Jiewen Yao
-Intel Corporation
+_Jiewen Yao_
+_Intel Corporation_
 
-Vincent J. Zimmer 
-Intel Corporation_
+_Vincent J. Zimmer _
+_Intel Corporation_
 
 
 March 2017
