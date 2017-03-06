@@ -1,4 +1,4 @@
-![](/assets/favicon-96x96.png)
+![](/assets/Tianocore_logo2.png)
 
 #####White Paper
 
