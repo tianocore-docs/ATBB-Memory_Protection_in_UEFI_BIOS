@@ -1,0 +1,9 @@
+{
+  "variables" : {
+    "draft"   : "yes",
+    "title"   : "A Tour Beyond BIOS - Memory Protection in UEFI BIOS",
+    "version" : "Revision 1.0"
+  },
+  "plugins": ["puml-aleung"],
+  "pluginsConfig": {}
+}

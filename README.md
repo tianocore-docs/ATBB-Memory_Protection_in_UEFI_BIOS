@@ -29,30 +29,29 @@
 
 -->
 
-![](/assets/Tianocore_logo2.png)
+<img src="media/TianocoreTitlePageLogo.jpg" width="300" />
 
-#####White Paper
+### {{ book.title }}
 
+{% if book.draft %}
+** DRAFT FOR REVIEW **
+{% else %}
+** {{ book.version }} **
+{% endif %}
 
-# A Tour Beyond BIOS - Memory Protection in UEFI BIOS
+** {{ gitbook.time|date('MM/DD/YYYY hh:mm:ss') }} **
 
+{% if book.udkrelease %}
+** {{ book.udkrelease }} **
+{% endif %}
 
-
-  _Jiewen Yao_, 
+  _Jiewen Yao_,
   _Intel Corporation_
 
-
-
-
-
-  _Vincent J. Zimmer _, 
+  _Vincent J. Zimmer _,
   _Intel Corporation_
 
-
-
-##### March 2017
-
-## Acknowledgements
+### Acknowledgements
 
 Redistribution and use in source (original document form) and 'compiled'
 forms (converted to PDF, epub, HTML and other formats) with or without
@@ -78,7 +77,12 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS DOCUMENTATION, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Copyright &#169; 2007-2017, Intel Corporation. All rights reserved.
+Copyright (c) 2007-2017, Intel Corporation. All rights reserved.
 
+### Revision History
+
+| Revision   | Revision History   | Date        |
+| ---------- | ------------------ | ----------- |
+| 1.0        | Initial release.   | March 2017  |
 
 
