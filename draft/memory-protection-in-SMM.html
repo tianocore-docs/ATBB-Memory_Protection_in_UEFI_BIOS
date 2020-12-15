@@ -1,0 +1,539 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Memory Protection in SMM · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="styles/website.css">
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="memory-protection-in-uefi.html" />
+    
+    
+    <link rel="prev" href="executive-summary.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="executive-summary.html">
+            
+                <a href="executive-summary.html">
+            
+                    
+                    Executive Summary
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3" data-path="memory-protection-in-SMM.html">
+            
+                <a href="memory-protection-in-SMM.html">
+            
+                    
+                    Memory Protection in SMM
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="memory-protection-in-uefi.html">
+            
+                <a href="memory-protection-in-uefi.html">
+            
+                    
+                    Memory Protection in UEFI
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="glossary.html">
+            
+                <a href="glossary.html">
+            
+                    
+                    Glossary
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="references.html">
+            
+                <a href="references.html">
+            
+                    
+                    References
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="authors.html">
+            
+                <a href="authors.html">
+            
+                    
+                    Authors
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" >
+            
+                <span>
+            
+                    
+                    Figures
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="2.1.1" data-path="memory-protection-in-SMM.html">
+            
+                <a href="memory-protection-in-SMM.html#figure-1---smram-memory-protection">
+            
+                    
+                    Figure 1 - SMRAM memory protection
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.1.2" data-path="memory-protection-in-SMM.html">
+            
+                <a href="memory-protection-in-SMM.html#figure-2---mapping-of-protection-in-smm">
+            
+                    
+                    Figure 2 - Mapping of Protection in SMM
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.1.3" data-path="memory-protection-in-SMM.html">
+            
+                <a href="memory-protection-in-SMM.html#figure-3---page-table-enforced-memory-layout">
+            
+                    
+                    Figure 3 - Page table enforced memory layout
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.1.4" data-path="memory-protection-in-uefi.html">
+            
+                <a href="memory-protection-in-uefi.html#figure-4---uefi-memory-protection">
+            
+                    
+                    Figure 4 - UEFI memory protection
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Memory Protection in SMM</a>
+    </h1>
+</div>
+<div>
+    <!-- 
+    <img style="float:left; align:middle; height:2em" src="media/TianocoreTitlePageLogo.jpg"/>
+     -->
+    
+      <h2>
+        <div style="position:absolute;text-align:left">A Tour Beyond BIOS - Memory Protection in UEFI BIOS</div>
+        <div style="position:absolute;width:100%;text-align:center">DRAFT [12/15/2020 07:19:57]</div>
+        <div style="text-align:right">Revision 1.0</div>
+      </h2>  
+    
+    <hr>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+                                <section class="normal markdown-section">
+                                
+                                <!--- @file
+  Memory Protection in SMM
+
+  Copyright (c) 2008-2017, Intel Corporation. All rights reserved.<BR>
+
+  Redistribution and use in source (original document form) and 'compiled'
+  forms (converted to PDF, epub, HTML and other formats) with or without
+  modification, are permitted provided that the following conditions are met:
+
+  1) Redistributions of source code (original document form) must retain the
+     above copyright notice, this list of conditions and the following
+     disclaimer as the first lines of this file unmodified.
+
+  2) Redistributions in compiled form (transformed to other DTDs, converted to
+     PDF, epub, HTML and other formats) must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+  THIS DOCUMENTATION IS PROVIDED BY TIANOCORE PROJECT "AS IS" AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+  EVENT SHALL TIANOCORE PROJECT  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS DOCUMENTATION, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-->
+<h1 id="memory-protection-in-smm">Memory Protection in SMM</h1>
+<p>The SMM is an isolated execution environment according to Intel(R) 64 and IA-32 Architectures Software Developer&apos;s Manual [<a href="https://software.intel.com/en-us/articles/intel-sdm" title="IA32SDM" target="_blank">IA32SDM</a>]. The UEFI Platform Initialization [<a href="http://uefi.org" title="PI Spec" target="_blank">PI</a>] specification volume 4 defines the SMM infrastructure. Figure 1 shows the SMM memory protection. <strong>RO</strong> designates read-only memory. <strong>XD </strong>designates execution-disabled memory.</p>
+<p><img src="media/Fig1- SMRAM memory protection.jpg" alt=""></p>
+<h6 id="figure-1---smram-memory-protection">Figure 1 - SMRAM memory protection</h6>
+<h2 id="protection-for-pe-image">Protection for PE image</h2>
+<p>In UEFI/PI firmware, the SMM image is a normal PE/COFF image loaded by the SmmCore. If a given section of the SMM image is page aligned, it may be protected according to the section attributes, such as read-only for the code and non-executable for data. See the top right of Figure 1.</p>
+<p>In EDK II, the PiSmmCore (<a href="https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/PiSmmCore/MemoryAttributesTable.c" target="_blank">https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/PiSmmCore/MemoryAttributesTable.c</a>) checks the PE image alignment and builds an <code>EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE</code> (<a href="https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Include/Guid/PiSmmMemoryAttributesTable.h" target="_blank">https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Include/Guid/PiSmmMemoryAttributesTable.h</a>) to record such information. If the PI SMM image is not page aligned, this table will not be published. If the <code>EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE</code> is published, that means the <code>EfiRuntimeServicesCode</code> contains only code and it is <code>EFI_MEMORY_RO</code>, and the <code>EfiRuntimeServicesData</code> contains only data and it is <code>EFI_MEMORY_XP</code>.</p>
+<p>Later the PiSmmCpu driver (<a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c)`" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c)`</a> SetMemMapAttributes()` API consumes the <code>EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE</code> and sets the page table attribute.</p>
+<p>There are several assumptions to support the PE image protection in SMM:</p>
+<ol>
+<li>The PE code section and data sections are not merged. If those 2 sections are merged, a #PF exception might be generated because the CPU might try to write a RO data item in the data section or execute a non-executable (NX) instruction in code section.</li>
+<li>The PE image can be protected if it is page aligned. There should not be any self-modified-code in the code region. If there is, a platform should not set this PE image to be page aligned.</li>
+</ol>
+<p>A platform may disable the XD in the UEFI environment, but this does not impact the SMM environment. The SMM environment may choose to always enable the XD upon SMM entry, and restore the XD state at the SMM exit point.</p>
+<h2 id="protection-for-stack-and-heap">Protection for stack and heap</h2>
+<p>The PiSmmCore maintains a memory map internally. (<a href="https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/PiSmmCore/Page.c" target="_blank">https://github.com/tianocore/edk2/blob/master/MdeModulePkg/Core/PiSmmCore/Page.c</a>) If an SMM module allocates the data with <code>EfiRuntimeServicesCode</code>, this data is marked as the code page. If the SMM module allocates the data with <code>EfiRuntimeServicesData</code>, this data is marked as the data page. This information is also exposed via the <code>EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE</code>.</p>
+<p>The same RO and XD policy is also applied to the normal SMM data region, such as stack and heap.</p>
+<h2 id="protection-for-critical-cpu-status">Protection for critical CPU status</h2>
+<p>Besides the PE image, the Intel X86 architecture has some special architecture-specific regions that need to be protected as well.</p>
+<h3 id="smm-entrypoint">SMM EntryPoint</h3>
+<p>When a hardware SMI occurs, the Intel X86 CPU jumps to an SMM entry point in order to execute the code at this location. This SMM entry point is not inside of a normal PE image, so we also need to protect this region. See the bottom right of figure 2.</p>
+<p>According to [<a href="https://software.intel.com/en-us/articles/intel-sdm" title="IA32SDM" target="_blank">IA32SDM</a>], the SMM entry point is at a fixed offset from SMBASE. In EDK II, the SMBASE and the SMM save state area are allocated at <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.c</a> <code>PiCpuSmmEntry()</code>. Both the SMM entry point and the SMM save state are allocated as a CODE page. Later <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c</a>  <code>PatchSmmSaveStateMap()</code> patches the SMM entry point to be read-only and the SMM save state to be non-executable.</p>
+<h3 id="gdtidt">GDT/IDT</h3>
+<p>The GDT defines the base address and the limit of a code segment or a data segment. If the GDT is updated, the code might be redirected to a malicious region. As such, the GDT should be set to read-only.</p>
+<p>The IDT defines the entry point of the exception handler. If the IDT is updated, the malicious code may trigger an exception and jump to a malicious region. As such, the IDT should be set to read-only as well.</p>
+<p>This work is done by <code>PatchGdtIdtMap()</code> at <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmFuncsArch.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmFuncsArch.c</a>.</p>
+<p>However, the IA32 version GDT cannot be set to read-only if the stack guard feature is enabled. (<a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmFuncsArch.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmFuncsArch.c</a>) The reason is that the IA32 stack guard needs to use a &quot;<em>task switch</em>&quot; to switch the stack, and the task switch needs to write the GDT and Task-State Segment (TSS). The X64 version of the GDT does not have such a problem because the X64 stack guard uses &quot;<em>interrupt stack table (IST)</em>&quot; to switch the stack. For details of the stack switch and exceptions, please refer to [<a href="https://software.intel.com/en-us/articles/intel-sdm" title="IA32SDM" target="_blank">IA32SDM</a>].</p>
+<h3 id="page-table">Page Table</h3>
+<p>In an X86 CPU, we rely on the page table to set up the read-only or non-executable region. In order to prevent the page table itself from being updated, we may need to set the page table itself to be read-only.</p>
+<p>The work is done at <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c</a> <code>SetPageTableAttributes()</code>.</p>
+<p>However, setting a page table to be read-only may break the original dynamic paging feature in SMM. There is a (PCD) <code>PcdCpuSmmStaticPageTable</code> to determine if the platform wants to enable the static page table or the dynamic page table.</p>
+<p>If <code>PcdCpuSmmStaticPageTable</code> is FALSE, the PiSmmCpu uses the original dynamic paging policy, namely the the PiSmmCpu only sets 4GiB paging by default. If the PiSmmCpu needs to access above 4GiB memory locations, a page fault exception (#PF) exception is triggered and an above-4GiB mapping is created in the page fault handler.</p>
+<p>If <code>PcdCpuSmmStaticPageTable</code> is TRUE, the PiSmmCpu will try to set the read-only attribute for the page table.</p>
+<p>Figure 2 shows the mapping of the protection.</p>
+<p><img src="media/Fig2 - Mapping of Protection in SMM.jpg" alt=""></p>
+<h6 id="figure-2---mapping-of-protection-in-smm">Figure 2 - Mapping of Protection in SMM</h6>
+<h2 id="life-cycle-of-the-protection">Life cycle of the protection</h2>
+<p>In a normal boot, the page table based protection is configured by the PiSmmCpu driver just after the SmmReadyToLock event by <code>PerformRemainingTasks()</code> at <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.c</a>. All read-only data must be ready before <code>SmmReadyToLock</code>.</p>
+<p>In an S3 resume, the protection is disabled during SMBASE relocation because the PiSmmCpu needs to set up the environment. The PiSmmCpu uses SmmS3Cr3, which is generated by <code>InitSmmS3Cr3()</code> at <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmProfileArch.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmProfileArch.c</a>  with 4G paging only. After the SMBASE relocation is done, all the protection takes effect up receipt of the next SMI by <code>PerformPreTasks()</code> at <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.c</a>.</p>
+<p>If there is an additional lock that needs to be set, it can be done in <code>SmmCpuFeaturesCompleteSmmReadyToLock()</code> API (defined in <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/Include/Library/SmmCpuFeaturesLib.h" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/Include/Library/SmmCpuFeaturesLib.h</a>).</p>
+<h2 id="smram-size-overhead">SMRAM Size Overhead</h2>
+<h3 id="pe-image">PE image</h3>
+<p>In order to protect the PE code and data sections, we must set the PE image section alignment to be 4K.</p>
+<p>In EDK II, the default PE image alignment is 0x20 bytes. Assuming one PE image has 3 sections (1 header, 1 code section, 1 data section), average overhead for one PE image is <code>(4K * 3) / 2 = 6K</code>.</p>
+<p>If a platform has n SMM images, the average of the overhead is <code>6K * n</code>.</p>
+<h3 id="page-table">Page Table</h3>
+<p>In order to protect the page table itself, we must use the static page table instead of the dynamic on-demand page table.</p>
+<p>The size of the dynamic paging is fixed. We need 6 fixed pages (24K) and 8 on-demand pages (32K). The total size of the page table is 56K in this case.</p>
+<p>The size of the static page table depends upon 2 things: 1) 1G paging capability, 2) max supported address bit. A rough estimation is below:</p>
+<ol>
+<li>If 1G paging is supported,</li>
+<li>32 bit addressing need (1+1+4) pages = 24K. (still use 2M paging for below 4G memory)</li>
+<li>39 bit addressing need (1+1+4) pages = 24K.</li>
+<li>48 bit addressing need (1+512) pages = 2M.</li>
+<li>If 1G paging is not supported, 2M paging is used.</li>
+<li>32 bit addressing need (1+1+4) pages = 24K.</li>
+<li>39 bit addressing need (1+1+512) pages = 2M.</li>
+<li>48 bit addressing need (1+512+512<em>512) pages = 1G. &lt; - This seems <strong><em>*not</em></strong></em> acceptable.</li>
+</ol>
+<p>The maximum address bit is determined by the (CPU_HOB) if it is present, or the physical address bit returned by the CPUID instruction if the CPU_HOB is not present. (<a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c</a>, <code>CalculateMaximumSupportAddress()</code>) A platform may set the CPU_HOB based upon the addressing capability of the memory controller or the CPU.</p>
+<h2 id="performance-overhead">Performance Overhead</h2>
+<ol>
+<li><p>The SMRAM protection setup is a one-time activity. It happens just after the SmmReadyToLock event. We do not observe too much impact to the system firmware boot performance. The activity only takes some small number of milliseconds.</p>
+</li>
+<li><p>The SMRAM runtime protection is based upon the page table. No additional CPU instruction is needed. As such, there is zero SMM runtime performance impact to have this protection.</p>
+</li>
+</ol>
+<h2 id="non-smram-access-in-smm">Non SMRAM access in SMM</h2>
+<p>Besides the SMRAM, the SMM memory protection also limits the access to the non-SMRAM region.</p>
+<p>First, the non-SMRAM region must be set to be non-executable because the SMM entities should not call any code outside SMRAM. Code outside of SMRAM might be controlled by malicious software.</p>
+<p>This protection work is done by <code>InitPaging()</code> at <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmProfile.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmProfile.c</a></p>
+<p>Second, because of the security concerns regarding SMM entities accessing VMM memory, [<a href="https://msdn.microsoft.com/en-us/library/windows/hardware/dn495660(v=vs.85).aspx#wsmt" title="WindowsWSMT" target="_blank">WindowsWSMT</a>] [<a href="http://download.microsoft.com/download/1/8/A/18A21244-EB67-4538-BAA2-1A54E0E490B6/WSMT.docx" title="WindowsWSMT docx" target="_blank">Wsmt.docx</a>] and [<a href="https://msdn.microsoft.com/en-us/library/windows/hardware/dn614617" title="MicrosoftHV" target="_blank">MicrosoftHV</a>] introduced the Windows SMM Security Mitigations Table (WSMT). A platform needs to report the WSMT table in order to declare that the SMI handler will validate the SMM communication buffer.</p>
+<p>As we discussed in [<a href="https://github.com/tianocore-docs/Docs/raw/master/White_Papers/A_Tour_Beyond_BIOS_Secure_SMM_Communication.pdf" title="SecureSmmComm" target="_blank">SecureSmmComm</a>], the SMI handler should check if the SMM communication buffer is from a fixed region, (EfiReservedMemoryType/ EfiACPIMemoryNVS/ EfiRuntimeServicesData/ EfiRuntimeServicesCode). However, this is a passive check. If a SMI handler does not include such a check, it is hard to detect.</p>
+<p>A better way is to use an active check. The PiSmmCpu driver sets the non-fixed DRAM region (EfiLoaderCode/ EfiLoaderData/ EfiBootServicesCode/ EfiBootServicesData/ EfiConventionalMemory/ EfiUnusableMemory/ EfiACPIReclaimMemory) to be not-present in the page tables after the SmmReadyToLock event.</p>
+<p>As such, if a platform SMI handler does not include the check recommended in [<a href="https://github.com/tianocore-docs/Docs/raw/master/White_Papers/A_Tour_Beyond_BIOS_Secure_SMM_Communication.pdf" title="SecureSmmComm" target="_blank">SecureSmmComm</a>], the system will get #PF exception within SMM on such an attack.</p>
+<p>This protection work is done by <code>SetUefiMemMapAttributes()</code> at <a href="https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c" target="_blank">https://github.com/tianocore/edk2/blob/master/UefiCpuPkg/PiSmmCpuDxeSmm/SmmCpuMemoryManagement.c</a>.</p>
+<p>Figure 3 shows final image layout.</p>
+<p> <img src="media/Fig3 - Page table enforced memory layout.jpg" alt=""></p>
+<h6 id="figure-3---page-table-enforced-memory-layout">Figure 3 - Page table enforced memory layout</h6>
+<p>The assumption for non-SMRAM access in SMM is described in [<a href="https://github.com/tianocore-docs/Docs/raw/master/White_Papers/A_Tour_Beyond_BIOS_Secure_SMM_Communication.pdf" title="SecureSmmComm" target="_blank">SecureSmmComm</a>].
+Besides that, this solution assumes that all DRAM regions are added to the Global Coherency Domain (GCD) management before EndOfDxe, so that the UEFI memory map can return all DRAM regions. If there are more regions added to the GCD after EndOfDxe, those regions are not set to not-present in the page table.
+NOTE: The SMM does not set the not-present bit for the GCD <strong>EfiGcdMemoryTypeNonExistent</strong> memory, because this type of memory may be converted to the other types, such as <strong>EfiGcdMemoryTypeReserved</strong>, or <strong>EfiGcdMemoryTypeMemoryMappedIo</strong>, which might be accessed by the SMM later.</p>
+<h2 id="limitation">Limitation</h2>
+<p>Setting up RO and NX attribute for SMRAM is a good enhancement to prevent a code overriding attack. However it has some limitations:</p>
+<ol>
+<li>It cannot resist a Return-Oriented-Programming (ROP) attack. [<a href="https://en.wikipedia.org/wiki/Return-oriented_programming" title="ROP" target="_blank">ROP</a>]. We might need ASLR to mitigate the ROP attack. [<a href="https://en.wikipedia.org/wiki/Address_space_layout_randomization" title="ASLR" target="_blank">ASLR</a>] With the code region randomized, an attacker cannot accurately predict the location of instructions in order to leverage gadgets.</li>
+<li>Not all important data structure are set to Read-Only. This is the current SMM driver limitation. The SMM driver can be updated to allocate the important structures to be read-only instead of a read-write global variable.</li>
+</ol>
+<p>To set not-present bit for non-fixed DRAM region in SmmReadyToLock is a good enhancement to enforce the protection policy. However, it cannot cover below cases:</p>
+<ol>
+<li>Memory Hot Plug. Take a server platform as the example, A RAS server may hot plug more DRAM during OS runtime, and rely on SMM to initialize those DRAM. This SMM Memory Initialization module may need access the DRAM for the memory test.</li>
+<li>Memory Mapped IO (MMIO). Ideally, not all MMIO regions are configured to be accessible to SMM. Some MMIO BARs are important such as VTd or SPI controller.  VTd BAR is important because OS need setup VTd to configuration the DMA protection. SPI controller BAR is important because BIOS SMM handler need access it to program the flash device. It should be a platform policy to configure which one should be accessible. The SMI handler must consider the case that the MMIO BAR might be modified by the malicious software and check if the MMIO BAR is in the valid region.</li>
+</ol>
+<h2 id="compatibility-considerations">Compatibility Considerations</h2>
+<ol>
+<li><p>So far, we have not observed self-modified-code in SMM image or executable code in data section. As such, we believe the PE image protection is compatible.</p>
+</li>
+<li><p>The protection for the SMM communication buffer may cause a #PF exception in SMM if the SMI handler does not perform the check recommended in [<a href="https://github.com/tianocore-docs/Docs/raw/master/White_Papers/A_Tour_Beyond_BIOS_Secure_SMM_Communication.pdf" title="SecureSmmComm" target="_blank">SecureSmmComm</a>].</p>
+</li>
+<li><p>Some legacy Compatibility Support Module (CSM) drivers may need co-work with SMM module. Then the SMM driver need access the legacy region. As such these memory regions should be allocated as ReservedMemory, such as BIOS data area (BDA) or extended BIOS data area (EBDA).</p>
+</li>
+</ol>
+<h2 id="call-for-action">Call for action</h2>
+<p>In order to support SMM memory protection, the firmware need configure SMM driver to be page aligned:</p>
+<ol>
+<li><p>Override link flags below to support SMM memory protection.</p>
+<pre><code>     [BuildOptions.common.EDKII.DXE_SMM_DRIVER,
+     BuildOptions.common.EDKII.SMM_CORE]
+     MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096
+   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
+</code></pre></li>
+<li><p>Evaluate if SMRAM size is big enough.</p>
+</li>
+</ol>
+<h4 id="summary">Summary</h4>
+<p>This section introduces the memory protection in SMM.</p>
+
+                                
+                                </section>
+                            
+                        </div>
+                    </div>
+                    
+                    
+
+<div>
+    <hr>
+    
+      <h2>
+        <div style="position:absolute;text-align:left">A Tour Beyond BIOS - Memory Protection in UEFI BIOS</div>
+        <div style="position:absolute;width:100%;text-align:center">DRAFT [12/15/2020 07:19:57]</div>
+        <div style="text-align:right">Revision 1.0</div>
+      </h2>  
+    
+</div>
+
+
+
+                
+            </div>
+
+            
+                
+                <a href="executive-summary.html" class="navigation navigation-prev " aria-label="Previous page: Executive Summary">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="memory-protection-in-uefi.html" class="navigation navigation-next " aria-label="Next page: Memory Protection in UEFI">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Memory Protection in SMM","level":"1.3","depth":1,"next":{"title":"Memory Protection in UEFI","level":"1.4","depth":1,"path":"memory-protection-in-uefi.md","ref":"memory-protection-in-uefi.md","articles":[]},"previous":{"title":"Executive Summary","level":"1.2","depth":1,"path":"executive-summary.md","ref":"executive-summary.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{"draft":"yes","title":"A Tour Beyond BIOS - Memory Protection in UEFI BIOS","version":"Revision 1.0"},"plugins":["puml-aleung"],"pluginsConfig":{"puml-aleung":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"memory-protection-in-SMM.md","mtime":"2020-12-15T19:19:20.203Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-12-15T19:19:57.970Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
